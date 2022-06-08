@@ -24,6 +24,7 @@ class MenuFrame(Frame):
         super().pack(fill=X)
     
     def addMenuButton(self, **kwargs):
+        'add button to the menu frame'
         try:
             _menu_button = _MenuButton(
             self,
@@ -44,16 +45,29 @@ class _MenuButton(Button):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         self._drop_down_menu = None        
-
     
     def createMenuDropDown(self, **kwargs):
+        '''
+        create menu drop down popup window, 
+        always call this first before when
+         you are creating a drop down window
+        '''
         self._drop_down_menu = Menu(self, **kwargs)
     
     def addDropDownMenuButton(self, **kwargs):
+        '''
+        Add a label and command for the window
+        self.addDropDownMenuButton(label="menu name", command=lambda: function())
+        '''
         self._drop_down_menu.add_command(**kwargs)
         
     
-    def displayDropDownButton(self, event):
+    def _displayDropDownButton(self, event):
+        '''
+        this displays the drop down window, 
+        also a thread is created so that the 
+        menu click is animated correctly
+        '''
         def meme():
             try:
                 self._drop_down_menu.tk_popup(self.winfo_rootx(), self.winfo_rooty()+self.winfo_height())
@@ -62,28 +76,15 @@ class _MenuButton(Button):
         Thread(target=lambda: meme()).start()
     
     def bindDropDownMenu(self):
-        self.bind("<Button-1>", self.displayDropDownButton)
+        '''
+        alway call this last after you are through adding 
+        and creating your drop down menu.
+        this binds the drop down menu to the right menu button 
+        '''
+        self.bind("<Button-1>", self._displayDropDownButton)
 
             
         
         
 
 
-class DropDownMenu():
-    def __init__(self, master, **kwargs) -> None:
-        self.master =  master
-        self._drop_down_menu = Menu(self.master, **kwargs)
-
-    def addPopupMenuButton(self, **kwargs):
-        self._drop_down_menu.add_command(**kwargs)
-    
-    def _createPopupMenu(self, event):
-        try:
-            self._drop_down_menu.tk_popup(event.x_root, event.y_root)
-        finally:
-            self._drop_down_menu.grab_release()
-    def displayMenu(self):
-        self.master.bind("<Button-1>", self._createPopupMenu)
-
-    # def pack(self, **kwargs):
-    #     super().pack()
